@@ -1,0 +1,2098 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Predicting a Sale Price of a House},
+  pdfkeywords={Linear Regression, Data Analysis, Neutral Network,
+Predicting},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{setspace}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Predicting a Sale Price of a House}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Using Multiple Linear Regression and Neutral Network to
+Predict the sale price of a house in Ames city}
+\author{true}
+\date{24 May 2022}
+
+\begin{document}
+\maketitle
+
+\includegraphics[width=1\linewidth]{sale}
+
+To view all the files in this project, please go to
+\href{https://github.com/asmozo24/Machine_Learning_Final_Project}{My
+Github site}.
+
+\newpage
+
+\centering
+\raggedright
+\newpage
+\tableofcontents
+\newpage
+
+\hypertarget{summary}{%
+\subsubsection{Summary}\label{summary}}
+
+Let's say someone is interested in buying a house and don't know how to
+prepare for it. Imagine this person who is looking for a dream home and
+don't even know where to start. Buying a house start with knowing the
+sale price. If this person who is wondering about buying house and has
+no clue, then there is a problem. Buying a house is a lifetime
+experience for many first-time home buyers. It is an exciting moment,
+but it can be a bad one if things turn out unexpectedly. Thus, the
+question is: how can a home buyer know about the sale price of a house?
+Meaning, how to predict a sale price of a house? Well! Machine learning
+has the answer to this question. Machine learning algorithm is a
+computer algorithm that teaches itself a pattern based on data. In other
+words, machine learning builds a pattern that helps identify the future
+event occurring.
+
+When we said machine learning is a computer algorithm to build a pattern
+for a sale price of a house that is not fully correct. It is not correct
+because there are many algorithms, and the pattern relies heavily on the
+data. If there is no data, then there is no price prediction. Therefore,
+data plays an important role in predicting the price of a something with
+the machine learning algorithm. The dataset used to predict the sale
+price of a house is from the Ames housing division in Iowa. The dataset
+is available at Kaggle.com. The data has about 1460 observations and 81
+features with sale price (the target variable) included. These features
+describe just about everything that is part of a house. We are talking
+about the lot size, the year the house was built, the garage condition,
+fireplace conditions, etc. Although there are enough variables in this
+dataset, we still need to clean the data before fitting it to the model
+for analysis. The cleaning involved removing all unnecessary variables,
+the variables that have equivalent meaning with other variables or
+variables that have way more missing values by visual inspection.
+Finally, we used correlation technique to find which variable has strong
+influence on the target variable.
+
+The purpose of cleaning the data is to ensure that we have the right
+data for the method used for the analysis. Let's recall that data
+analysis is the process of collecting, modeling, and analyzing data to
+extract meaningful information that ultimately leads to decision-making.
+In other words, the leadership want to make decisions based on solid
+facts. Building these solid facts is where the methodology comes to
+play. There are several methods and techniques use in analyzing the
+data. The choice of the method and technique will depend on the aspect
+of the data (quantitative or qualitative). This Ames Housing data has
+quantitative aspect because it has finite number (discrete data) of
+values resulted from measurements collected on each house individually.
+For example, the number of bedrooms in the house, the number of car
+garage attached to the house and the size of the lot. Although some
+values are qualitative such as the condition of the garage (excellent,
+good, fair and none), it still refers to quantitative data. These data
+are taken as quantitative because this is not a survey where the
+responses are not uniformed. It is measurable data with standard in
+place. This type of measurements requires expertise that would apply the
+standards and unformalized for all houses. Cleaning the data is a step
+that precedes the analysis. We used multiple linear regression and
+Neutral Network method to analyze the data. The technique used is
+basically fitting the data to the model. The model here refers to the
+computerized formulas for each machine learning algorithm.
+
+The purpose of performing the analysis is to predict the sale price of a
+house. Initially, we had a question about how one can predict the sale
+price of a house. Well! This is where the magic happens. The accuracy of
+predicting this price depends on the formulas. The choice of multiple
+linear regression is because while preparing the data for the analysis,
+we plotted few predictors against the target variable and saw some
+linear relationship. The second choice of neutral network is because we
+wanted to see how an unsupervised machine learning will perform against
+a supervised one. At the end, the verdict was tight because each
+algorithm performed well. Since the neutral network seems to be popular
+in neuron studies (complicated topic), we thought it would have easily
+outperformed the multiple linear regression. The assumption was not
+valid because this regression analysis showed better results with a low
+mean squared error value compared with the one from neutral network. In
+addition, based on the output values such as p-value, the chosen
+explanatory variables explained well the sale price of a house.
+Furthermore, we like the regression performance better because we can
+apply it into a business. Knowing a set of features along with the
+machine learning algorithm that can directly influence the sale price of
+a house, we can build an application that can tell customers the sale
+price of a house. We think this can be a starting point for many home
+buyers. There are other factors such as speculation (demand and supply)
+and inflation that influence the sale price of a house, but we believe
+the home buyers want to know this price first.
+
+\hypertarget{problem-statement}{%
+\subsubsection{Problem Statement}\label{problem-statement}}
+
+How can we predict the sale price of a house?
+
+\hypertarget{data-collection}{%
+\subsubsection{Data Collection}\label{data-collection}}
+
+\hypertarget{data-source}{%
+\paragraph{Data source}\label{data-source}}
+
+We found some interesting dataset from data source:
+\url{https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques/data}
+
+This data was originally generated the Ames Housing, a division within
+the Ames city in Iowa state. Thanks to Kaggle for making the data
+available free of use. The data is about a sale record of houses with
+all the defined criteria. Below is the description of the variable
+present in the dataset.
+
+For a quicker look, we made the data (no modification) available at
+\href{https://github.com/asmozo24/Machine_Learning_Final_Project/blob/main/train.csv}{My
+Github site}
+
+\hypertarget{data-dictionary}{%
+\paragraph{Data Dictionary}\label{data-dictionary}}
+
+\begin{verbatim}
+##                        MSSubClass..Identifies.the.type.of.dwelling.involved.in.the.sale.
+## 1                                                                                     20
+## 2                                                                                     30
+## 3                                                                                     40
+## 4                                                                                     45
+## 5                                                                                     50
+## 6                                                                                     60
+## 7                                                                                     70
+## 8                                                                                     75
+## 9                                                                                     80
+## 10                                                                                    85
+## 11                                                                                    90
+## 12                                                                                   120
+## 13                                                                                   150
+## 14                                                                                   160
+## 15                                                                                   180
+## 16                                                                                   190
+## 17                   MSZoning: Identifies the general zoning classification of the sale.
+## 18                                                                                      
+## 19                                                                                     A
+## 20                                                                                     C
+## 21                                                                                    FV
+## 22                                                                                     I
+## 23                                                                                    RH
+## 24                                                                                    RL
+## 25                                                                                    RP
+## 26                                                                                    RM
+## 27                                                                                      
+## 28                              LotFrontage: Linear feet of street connected to property
+## 29                                                      LotArea: Lot size in square feet
+## 30                                               Street: Type of road access to property
+## 31                                                                                  Grvl
+## 32                                                                                  Pave
+## 33                                                                                      
+## 34                                               Alley: Type of alley access to property
+## 35                                                                                  Grvl
+## 36                                                                                  Pave
+## 37                                                                                   NA 
+## 38                                                                                      
+## 39                                                   LotShape: General shape of property
+## 40                                                                                   Reg
+## 41                                                                                   IR1
+## 42                                                                                   IR2
+## 43                                                                                   IR3
+## 44                                                                                      
+## 45                                                 LandContour: Flatness of the property
+## 46                                                                                   Lvl
+## 47                                                                                   Bnk
+## 48                                                                                   HLS
+## 49                                                                                   Low
+## 50                                                                                      
+## 51                                                Utilities: Type of utilities available
+## 52                                                                                      
+## 53                                                                                AllPub
+## 54                                                                                NoSewr
+## 55                                                                                NoSeWa
+## 56                                                                                   ELO
+## 57                                                                                      
+## 58                                                          LotConfig: Lot configuration
+## 59                                                                                Inside
+## 60                                                                                Corner
+## 61                                                                               CulDSac
+## 62                                                                                   FR2
+## 63                                                                                   FR3
+## 64                                                                                      
+## 65                                                          LandSlope: Slope of property
+## 66                                                                                      
+## 67                                                                                   Gtl
+## 68                                                                                   Mod
+## 69                                                                                   Sev
+## 70                                                                                      
+## 71                              Neighborhood: Physical locations within Ames city limits
+## 72                                                                               Blmngtn
+## 73                                                                               Blueste
+## 74                                                                                BrDale
+## 75                                                                               BrkSide
+## 76                                                                               ClearCr
+## 77                                                                               CollgCr
+## 78                                                                               Crawfor
+## 79                                                                               Edwards
+## 80                                                                               Gilbert
+## 81                                                                                IDOTRR
+## 82                                                                               MeadowV
+## 83                                                                               Mitchel
+## 84                                                                                 Names
+## 85                                                                               NoRidge
+## 86                                                                               NPkVill
+## 87                                                                               NridgHt
+## 88                                                                                NWAmes
+## 89                                                                               OldTown
+## 90                                                                                 SWISU
+## 91                                                                                Sawyer
+## 92                                                                               SawyerW
+## 93                                                                               Somerst
+## 94                                                                               StoneBr
+## 95                                                                                Timber
+## 96                                                                               Veenker
+## 97                                                                                      
+## 98                                                                                      
+## 99                                           Condition1: Proximity to various conditions
+## 100                                                                                     
+## 101                                                                               Artery
+## 102                                                                                Feedr
+## 103                                                                                 Norm
+## 104                                                                                 RRNn
+## 105                                                                                 RRAn
+## 106                                                                                 PosN
+## 107                                                                                 PosA
+## 108                                                                                 RRNe
+## 109                                                                                 RRAe
+## 110                                                                                     
+## 111            Condition2: Proximity to various conditions (if more than one is present)
+## 112                                                                                     
+## 113                                                                               Artery
+## 114                                                                                Feedr
+## 115                                                                                 Norm
+## 116                                                                                 RRNn
+## 117                                                                                 RRAn
+## 118                                                                                 PosN
+## 119                                                                                 PosA
+## 120                                                                                 RRNe
+## 121                                                                                 RRAe
+## 122                                                                                     
+## 123                                                           BldgType: Type of dwelling
+## 124                                                                                     
+## 125                                                                                 1Fam
+## 126                                                                               2FmCon
+## 127                                                                                Duplx
+## 128                                                                               TwnhsE
+## 129                                                                               TwnhsI
+## 130                                                                                     
+## 131                                                        HouseStyle: Style of dwelling
+## 132                                                                                     
+## 133                                                                               1Story
+## 134                                                                               1.5Fin
+## 135                                                                               1.5Unf
+## 136                                                                               2Story
+## 137                                                                               2.5Fin
+## 138                                                                               2.5Unf
+## 139                                                                               SFoyer
+## 140                                                                                 SLvl
+## 141                                                                                     
+## 142                      OverallQual: Rates the overall material and finish of the house
+## 143                                                                                   10
+## 144                                                                                    9
+## 145                                                                                    8
+## 146                                                                                    7
+## 147                                                                                    6
+## 148                                                                                    5
+## 149                                                                                    4
+## 150                                                                                    3
+## 151                                                                                    2
+## 152                                                                                    1
+## 153                                                                                     
+## 154                                OverallCond: Rates the overall condition of the house
+## 155                                                                                   10
+## 156                                                                                    9
+## 157                                                                                    8
+## 158                                                                                    7
+## 159                                                                                    6
+## 160                                                                                    5
+## 161                                                                                    4
+## 162                                                                                    3
+## 163                                                                                    2
+## 164                                                                                    1
+## 165                                                                                     
+## 166                                                YearBuilt: Original construction date
+## 167 YearRemodAdd: Remodel date (same as construction date if no remodeling or additions)
+## 168                                                              RoofStyle: Type of roof
+## 169                                                                                 Flat
+## 170                                                                                Gable
+## 171                                                                              Gambrel
+## 172                                                                                  Hip
+## 173                                                                              Mansard
+## 174                                                                                 Shed
+## 175                                                                                     
+## 176                                                              RoofMatl: Roof material
+## 177                                                                              ClyTile
+## 178                                                                              CompShg
+## 179                                                                              Membran
+## 180                                                                                Metal
+## 181                                                                                 Roll
+## 182                                                                              Tar&Grv
+## 183                                                                              WdShake
+## 184                                                                              WdShngl
+## 185                                                                                     
+## 186                                              Exterior1st: Exterior covering on house
+## 187                                                                              AsbShng
+## 188                                                                              AsphShn
+## 189                                                                              BrkComm
+## 190                                                                              BrkFace
+## 191                                                                               CBlock
+## 192                                                                              CemntBd
+## 193                                                                              HdBoard
+## 194                                                                              ImStucc
+## 195                                                                              MetalSd
+## 196                                                                                Other
+## 197                                                                              Plywood
+## 198                                                                              PreCast
+## 199                                                                                Stone
+## 200                                                                               Stucco
+## 201                                                                              VinylSd
+## 202                                                                              Wd Sdng
+## 203                                                                              WdShing
+## 204                                                                                     
+## 205                  Exterior2nd: Exterior covering on house (if more than one material)
+## 206                                                                              AsbShng
+## 207                                                                              AsphShn
+## 208                                                                              BrkComm
+## 209                                                                              BrkFace
+## 210                                                                               CBlock
+## 211                                                                              CemntBd
+## 212                                                                              HdBoard
+## 213                                                                              ImStucc
+## 214                                                                              MetalSd
+## 215                                                                                Other
+## 216                                                                              Plywood
+## 217                                                                              PreCast
+## 218                                                                                Stone
+## 219                                                                               Stucco
+## 220                                                                              VinylSd
+## 221                                                                              Wd Sdng
+## 222                                                                              WdShing
+## 223                                                                                     
+## 224                                                      MasVnrType: Masonry veneer type
+## 225                                                                               BrkCmn
+## 226                                                                              BrkFace
+## 227                                                                               CBlock
+## 228                                                                                 None
+## 229                                                                                Stone
+## 230                                                                                     
+## 231                                       MasVnrArea: Masonry veneer area in square feet
+## 232                    ExterQual: Evaluates the quality of the material on the exterior 
+## 233                                                                                     
+## 234                                                                                   Ex
+## 235                                                                                   Gd
+## 236                                                                                   TA
+## 237                                                                                   Fa
+## 238                                                                                   Po
+## 239                                                                                     
+## 240           ExterCond: Evaluates the present condition of the material on the exterior
+## 241                                                                                     
+## 242                                                                                   Ex
+## 243                                                                                   Gd
+## 244                                                                                   TA
+## 245                                                                                   Fa
+## 246                                                                                   Po
+## 247                                                                                     
+## 248                                                       Foundation: Type of foundation
+## 249                                                                                     
+## 250                                                                               BrkTil
+## 251                                                                               CBlock
+## 252                                                                                PConc
+## 253                                                                                 Slab
+## 254                                                                                Stone
+## 255                                                                                 Wood
+## 256                                                                                     
+## 257                                       BsmtQual: Evaluates the height of the basement
+## 258                                                                                   Ex
+## 259                                                                                   Gd
+## 260                                                                                   TA
+## 261                                                                                   Fa
+## 262                                                                                   Po
+## 263                                                                                   NA
+## 264                                                                                     
+## 265                            BsmtCond: Evaluates the general condition of the basement
+## 266                                                                                   Ex
+## 267                                                                                   Gd
+## 268                                                                                   TA
+## 269                                                                                   Fa
+## 270                                                                                   Po
+## 271                                                                                   NA
+## 272                                                                                     
+## 273                                BsmtExposure: Refers to walkout or garden level walls
+## 274                                                                                   Gd
+## 275                                                                                   Av
+## 276                                                                                   Mn
+## 277                                                                                   No
+## 278                                                                                   NA
+## 279                                                                                     
+## 280                                       BsmtFinType1: Rating of basement finished area
+## 281                                                                                  GLQ
+## 282                                                                                  ALQ
+## 283                                                                                  BLQ
+## 284                                                                                  Rec
+## 285                                                                                  LwQ
+## 286                                                                                  Unf
+## 287                                                                                   NA
+## 288                                                                                     
+## 289                                              BsmtFinSF1: Type 1 finished square feet
+## 290                   BsmtFinType2: Rating of basement finished area (if multiple types)
+## 291                                                                                  GLQ
+## 292                                                                                  ALQ
+## 293                                                                                  BLQ
+## 294                                                                                  Rec
+## 295                                                                                  LwQ
+## 296                                                                                  Unf
+## 297                                                                                   NA
+## 298                                              BsmtFinSF2: Type 2 finished square feet
+## 299                                   BsmtUnfSF: Unfinished square feet of basement area
+## 300                                      TotalBsmtSF: Total square feet of basement area
+## 301                                                             Heating: Type of heating
+## 302                                                                                     
+## 303                                                                                Floor
+## 304                                                                                 GasA
+## 305                                                                                 GasW
+## 306                                                                                 Grav
+## 307                                                                                 OthW
+## 308                                                                                 Wall
+## 309                                                                                     
+## 310                                             HeatingQC: Heating quality and condition
+## 311                                                                                   Ex
+## 312                                                                                   Gd
+## 313                                                                                   TA
+## 314                                                                                   Fa
+## 315                                                                                   Po
+## 316                                                                                     
+## 317                                                 CentralAir: Central air conditioning
+## 318                                                                                    N
+## 319                                                                                    Y
+## 320                                                                                     
+## 321                                                        Electrical: Electrical system
+## 322                                                                                SBrkr
+## 323                                                                                FuseA
+## 324                                                                                FuseF
+## 325                                                                                FuseP
+## 326                                                                                  Mix
+## 327                                                                                     
+## 328                                                    1stFlrSF: First Floor square feet
+## 329                                                                                     
+## 330                                                   2ndFlrSF: Second floor square feet
+## 331                          LowQualFinSF: Low quality finished square feet (all floors)
+## 332                              GrLivArea: Above grade (ground) living area square feet
+## 333                                                BsmtFullBath: Basement full bathrooms
+## 334                                                BsmtHalfBath: Basement half bathrooms
+## 335                                                 FullBath: Full bathrooms above grade
+## 336                                                     HalfBath: Half baths above grade
+## 337                   Bedroom: Bedrooms above grade (does NOT include basement bedrooms)
+## 338                                                        Kitchen: Kitchens above grade
+## 339                                                         KitchenQual: Kitchen quality
+## 340                                                                                   Ex
+## 341                                                                                   Gd
+## 342                                                                                   TA
+## 343                                                                                   Fa
+## 344                                                                                   Po
+## 345                                                                                     
+## 346                   TotRmsAbvGrd: Total rooms above grade (does not include bathrooms)
+## 347      Functional: Home functionality (Assume typical unless deductions are warranted)
+## 348                                                                                  Typ
+## 349                                                                                 Min1
+## 350                                                                                 Min2
+## 351                                                                                  Mod
+## 352                                                                                 Maj1
+## 353                                                                                 Maj2
+## 354                                                                                  Sev
+## 355                                                                                  Sal
+## 356                                                                                     
+## 357                                                     Fireplaces: Number of fireplaces
+## 358                                                       FireplaceQu: Fireplace quality
+## 359                                                                                   Ex
+## 360                                                                                   Gd
+## 361                                                                                   TA
+## 362                                                                                   Fa
+## 363                                                                                   Po
+## 364                                                                                   NA
+## 365                                                                                     
+## 366                                                          GarageType: Garage location
+## 367                                                                                     
+## 368                                                                               2Types
+## 369                                                                               Attchd
+## 370                                                                              Basment
+## 371                                                                              BuiltIn
+## 372                                                                              CarPort
+## 373                                                                               Detchd
+## 374                                                                                   NA
+## 375                                                                                     
+## 376                                                   GarageYrBlt: Year garage was built
+## 377                                                                                     
+## 378                                          GarageFinish: Interior finish of the garage
+## 379                                                                                  Fin
+## 380                                                                                  RFn
+## 381                                                                                  Unf
+## 382                                                                                   NA
+## 383                                                                                     
+## 384                                           GarageCars: Size of garage in car capacity
+## 385                                            GarageArea: Size of garage in square feet
+## 386                                                           GarageQual: Garage quality
+## 387                                                                                   Ex
+## 388                                                                                   Gd
+## 389                                                                                   TA
+## 390                                                                                   Fa
+## 391                                                                                   Po
+## 392                                                                                   NA
+## 393                                                                                     
+## 394                                                         GarageCond: Garage condition
+## 395                                                                                   Ex
+## 396                                                                                   Gd
+## 397                                                                                   TA
+## 398                                                                                   Fa
+## 399                                                                                   Po
+## 400                                                                                   NA
+## 401                                                                                     
+## 402                                                           PavedDrive: Paved driveway
+## 403                                                                                    Y
+## 404                                                                                    P
+## 405                                                                                    N
+## 406                                                                                     
+## 407                                            WoodDeckSF: Wood deck area in square feet
+## 408                                          OpenPorchSF: Open porch area in square feet
+## 409                                    EnclosedPorch: Enclosed porch area in square feet
+## 410                                    3SsnPorch: Three season porch area in square feet
+## 411                                        ScreenPorch: Screen porch area in square feet
+## 412                                                   PoolArea: Pool area in square feet
+## 413                                                                 PoolQC: Pool quality
+## 414                                                                                     
+## 415                                                                                   Ex
+## 416                                                                                   Gd
+## 417                                                                                   TA
+## 418                                                                                   Fa
+## 419                                                                                   NA
+## 420                                                                                     
+## 421                                                                 Fence: Fence quality
+## 422                                                                                     
+## 423                                                                                GdPrv
+## 424                                                                                MnPrv
+## 425                                                                                 GdWo
+## 426                                                                                 MnWw
+## 427                                                                                   NA
+## 428                                                                                     
+## 429                   MiscFeature: Miscellaneous feature not covered in other categories
+## 430                                                                                     
+## 431                                                                                 Elev
+## 432                                                                                 Gar2
+## 433                                                                                 Othr
+## 434                                                                                 Shed
+## 435                                                                                 TenC
+## 436                                                                                   NA
+## 437                                                                                     
+## 438                                             MiscVal: $Value of miscellaneous feature
+## 439                                                              MoSold: Month Sold (MM)
+## 440                                                             YrSold: Year Sold (YYYY)
+## 441                                                               SaleType: Type of sale
+## 442                                                                                     
+## 443                                                                                  WD 
+## 444                                                                                  CWD
+## 445                                                                                  VWD
+## 446                                                                                  New
+## 447                                                                                  COD
+## 448                                                                                  Con
+## 449                                                                                ConLw
+## 450                                                                                ConLI
+## 451                                                                                ConLD
+## 452                                                                                  Oth
+## 453                                                                                     
+## 454                                                     SaleCondition: Condition of sale
+## 455                                                                               Normal
+## 456                                                                              Abnorml
+## 457                                                                              AdjLand
+## 458                                                                               Alloca
+## 459                                                                               Family
+## 460                                                                              Partial
+##                                                                                              X
+## 1                                                              1-STORY 1946 & NEWER ALL STYLES
+## 2                                                                         1-STORY 1945 & OLDER
+## 3                                                            1-STORY W/FINISHED ATTIC ALL AGES
+## 4                                                            1-1/2 STORY - UNFINISHED ALL AGES
+## 5                                                                1-1/2 STORY FINISHED ALL AGES
+## 6                                                                         2-STORY 1946 & NEWER
+## 7                                                                         2-STORY 1945 & OLDER
+## 8                                                                         2-1/2 STORY ALL AGES
+## 9                                                                         SPLIT OR MULTI-LEVEL
+## 10                                                                                 SPLIT FOYER
+## 11                                                                DUPLEX - ALL STYLES AND AGES
+## 12                                       1-STORY PUD (Planned Unit Development) - 1946 & NEWER
+## 13                                                                  1-1/2 STORY PUD - ALL AGES
+## 14                                                                  2-STORY PUD - 1946 & NEWER
+## 15                                                     PUD - MULTILEVEL - INCL SPLIT LEV/FOYER
+## 16                                                   2 FAMILY CONVERSION - ALL STYLES AND AGES
+## 17                                                                                            
+## 18                                                                                            
+## 19                                                                                 Agriculture
+## 20                                                                                  Commercial
+## 21                                                                Floating Village Residential
+## 22                                                                                  Industrial
+## 23                                                                    Residential High Density
+## 24                                                                     Residential Low Density
+## 25                                                               Residential Low Density Park 
+## 26                                                                  Residential Medium Density
+## 27                                                                                            
+## 28                                                                                            
+## 29                                                                                            
+## 30                                                                                            
+## 31                                                                                      Gravel
+## 32                                                                                       Paved
+## 33                                                                                            
+## 34                                                                                            
+## 35                                                                                      Gravel
+## 36                                                                                       Paved
+## 37                                                                             No alley access
+## 38                                                                                            
+## 39                                                                                            
+## 40                                                                                     Regular
+## 41                                                                          Slightly irregular
+## 42                                                                        Moderately Irregular
+## 43                                                                                   Irregular
+## 44                                                                                            
+## 45                                                                                            
+## 46                                                                             Near Flat/Level
+## 47                           Banked - Quick and significant rise from street grade to building
+## 48                                              Hillside - Significant slope from side to side
+## 49                                                                                  Depression
+## 50                                                                                            
+## 51                                                                                            
+## 52                                                                                            
+## 53                                                            All public Utilities (E,G,W,& S)
+## 54                                                   Electricity, Gas, and Water (Septic Tank)
+## 55                                                                    Electricity and Gas Only
+## 56                                                                            Electricity only
+## 57                                                                                            
+## 58                                                                                            
+## 59                                                                                  Inside lot
+## 60                                                                                  Corner lot
+## 61                                                                                  Cul-de-sac
+## 62                                                             Frontage on 2 sides of property
+## 63                                                             Frontage on 3 sides of property
+## 64                                                                                            
+## 65                                                                                            
+## 66                                                                                            
+## 67                                                                                Gentle slope
+## 68                                                                              Moderate Slope
+## 69                                                                                Severe Slope
+## 70                                                                                            
+## 71                                                                                            
+## 72                                                                         Bloomington Heights
+## 73                                                                                    Bluestem
+## 74                                                                                   Briardale
+## 75                                                                                   Brookside
+## 76                                                                                 Clear Creek
+## 77                                                                               College Creek
+## 78                                                                                    Crawford
+## 79                                                                                     Edwards
+## 80                                                                                     Gilbert
+## 81                                                                      Iowa DOT and Rail Road
+## 82                                                                              Meadow Village
+## 83                                                                                    Mitchell
+## 84                                                                                  North Ames
+## 85                                                                                  Northridge
+## 86                                                                             Northpark Villa
+## 87                                                                          Northridge Heights
+## 88                                                                              Northwest Ames
+## 89                                                                                    Old Town
+## 90                                                       South & West of Iowa State University
+## 91                                                                                      Sawyer
+## 92                                                                                 Sawyer West
+## 93                                                                                    Somerset
+## 94                                                                                 Stone Brook
+## 95                                                                                  Timberland
+## 96                                                                                     Veenker
+## 97                                                                                            
+## 98                                                                                            
+## 99                                                                                            
+## 100                                                                                           
+## 101                                                                Adjacent to arterial street
+## 102                                                                  Adjacent to feeder street
+## 103                                                                                     Normal
+## 104                                                        Within 200' of North-South Railroad
+## 105                                                           Adjacent to North-South Railroad
+## 106                                      Near positive off-site feature--park, greenbelt, etc.
+## 107                                                       Adjacent to postive off-site feature
+## 108                                                          Within 200' of East-West Railroad
+## 109                                                             Adjacent to East-West Railroad
+## 110                                                                                           
+## 111                                                                                           
+## 112                                                                                           
+## 113                                                                Adjacent to arterial street
+## 114                                                                  Adjacent to feeder street
+## 115                                                                                     Normal
+## 116                                                        Within 200' of North-South Railroad
+## 117                                                           Adjacent to North-South Railroad
+## 118                                      Near positive off-site feature--park, greenbelt, etc.
+## 119                                                       Adjacent to postive off-site feature
+## 120                                                          Within 200' of East-West Railroad
+## 121                                                             Adjacent to East-West Railroad
+## 122                                                                                           
+## 123                                                                                           
+## 124                                                                                           
+## 125                                                                     Single-family Detached
+## 126                             Two-family Conversion; originally built as one-family dwelling
+## 127                                                                                     Duplex
+## 128                                                                         Townhouse End Unit
+## 129                                                                      Townhouse Inside Unit
+## 130                                                                                           
+## 131                                                                                           
+## 132                                                                                           
+## 133                                                                                  One story
+## 134                                                 One and one-half story: 2nd level finished
+## 135                                               One and one-half story: 2nd level unfinished
+## 136                                                                                  Two story
+## 137                                                 Two and one-half story: 2nd level finished
+## 138                                               Two and one-half story: 2nd level unfinished
+## 139                                                                                Split Foyer
+## 140                                                                                Split Level
+## 141                                                                                           
+## 142                                                                                           
+## 143                                                                             Very Excellent
+## 144                                                                                  Excellent
+## 145                                                                                  Very Good
+## 146                                                                                       Good
+## 147                                                                              Above Average
+## 148                                                                                    Average
+## 149                                                                              Below Average
+## 150                                                                                       Fair
+## 151                                                                                       Poor
+## 152                                                                                  Very Poor
+## 153                                                                                           
+## 154                                                                                           
+## 155                                                                             Very Excellent
+## 156                                                                                  Excellent
+## 157                                                                                  Very Good
+## 158                                                                                       Good
+## 159                                                                              Above Average
+## 160                                                                                    Average
+## 161                                                                              Below Average
+## 162                                                                                       Fair
+## 163                                                                                       Poor
+## 164                                                                                  Very Poor
+## 165                                                                                           
+## 166                                                                                           
+## 167                                                                                           
+## 168                                                                                           
+## 169                                                                                       Flat
+## 170                                                                                      Gable
+## 171                                                                              Gabrel (Barn)
+## 172                                                                                        Hip
+## 173                                                                                    Mansard
+## 174                                                                                       Shed
+## 175                                                                                           
+## 176                                                                                           
+## 177                                                                               Clay or Tile
+## 178                                                               Standard (Composite) Shingle
+## 179                                                                                   Membrane
+## 180                                                                                      Metal
+## 181                                                                                       Roll
+## 182                                                                               Gravel & Tar
+## 183                                                                                Wood Shakes
+## 184                                                                              Wood Shingles
+## 185                                                                                           
+## 186                                                                                           
+## 187                                                                          Asbestos Shingles
+## 188                                                                           Asphalt Shingles
+## 189                                                                               Brick Common
+## 190                                                                                 Brick Face
+## 191                                                                               Cinder Block
+## 192                                                                               Cement Board
+## 193                                                                                 Hard Board
+## 194                                                                           Imitation Stucco
+## 195                                                                               Metal Siding
+## 196                                                                                      Other
+## 197                                                                                    Plywood
+## 198                                                                                    PreCast
+## 199                                                                                      Stone
+## 200                                                                                     Stucco
+## 201                                                                               Vinyl Siding
+## 202                                                                                Wood Siding
+## 203                                                                              Wood Shingles
+## 204                                                                                           
+## 205                                                                                           
+## 206                                                                          Asbestos Shingles
+## 207                                                                           Asphalt Shingles
+## 208                                                                               Brick Common
+## 209                                                                                 Brick Face
+## 210                                                                               Cinder Block
+## 211                                                                               Cement Board
+## 212                                                                                 Hard Board
+## 213                                                                           Imitation Stucco
+## 214                                                                               Metal Siding
+## 215                                                                                      Other
+## 216                                                                                    Plywood
+## 217                                                                                    PreCast
+## 218                                                                                      Stone
+## 219                                                                                     Stucco
+## 220                                                                               Vinyl Siding
+## 221                                                                                Wood Siding
+## 222                                                                              Wood Shingles
+## 223                                                                                           
+## 224                                                                                           
+## 225                                                                               Brick Common
+## 226                                                                                 Brick Face
+## 227                                                                               Cinder Block
+## 228                                                                                       None
+## 229                                                                                      Stone
+## 230                                                                                           
+## 231                                                                                           
+## 232                                                                                           
+## 233                                                                                           
+## 234                                                                                  Excellent
+## 235                                                                                       Good
+## 236                                                                            Average/Typical
+## 237                                                                                       Fair
+## 238                                                                                       Poor
+## 239                                                                                           
+## 240                                                                                           
+## 241                                                                                           
+## 242                                                                                  Excellent
+## 243                                                                                       Good
+## 244                                                                            Average/Typical
+## 245                                                                                       Fair
+## 246                                                                                       Poor
+## 247                                                                                           
+## 248                                                                                           
+## 249                                                                                           
+## 250                                                                               Brick & Tile
+## 251                                                                               Cinder Block
+## 252                                                                            Poured Contrete
+## 253                                                                                       Slab
+## 254                                                                                      Stone
+## 255                                                                                       Wood
+## 256                                                                                           
+## 257                                                                                           
+## 258                                                                    Excellent (100+ inches)
+## 259                                                                        Good (90-99 inches)
+## 260                                                                     Typical (80-89 inches)
+## 261                                                                        Fair (70-79 inches)
+## 262                                                                           Poor (<70 inches
+## 263                                                                                No Basement
+## 264                                                                                           
+## 265                                                                                           
+## 266                                                                                  Excellent
+## 267                                                                                       Good
+## 268                                                          Typical - slight dampness allowed
+## 269                                               Fair - dampness or some cracking or settling
+## 270                                               Poor - Severe cracking, settling, or wetness
+## 271                                                                                No Basement
+## 272                                                                                           
+## 273                                                                                           
+## 274                                                                              Good Exposure
+## 275                 Average Exposure (split levels or foyers typically score average or above)
+## 276                                                                           Mimimum Exposure
+## 277                                                                                No Exposure
+## 278                                                                                No Basement
+## 279                                                                                           
+## 280                                                                                           
+## 281                                                                       Good Living Quarters
+## 282                                                                    Average Living Quarters
+## 283                                                              Below Average Living Quarters
+## 284                                                                           Average Rec Room
+## 285                                                                                Low Quality
+## 286                                                                                  Unfinshed
+## 287                                                                                No Basement
+## 288                                                                                           
+## 289                                                                                           
+## 290                                                                                           
+## 291                                                                       Good Living Quarters
+## 292                                                                    Average Living Quarters
+## 293                                                              Below Average Living Quarters
+## 294                                                                           Average Rec Room
+## 295                                                                                Low Quality
+## 296                                                                                  Unfinshed
+## 297                                                                                No Basement
+## 298                                                                                           
+## 299                                                                                           
+## 300                                                                                           
+## 301                                                                                           
+## 302                                                                                           
+## 303                                                                              Floor Furnace
+## 304                                                                Gas forced warm air furnace
+## 305                                                                Gas hot water or steam heat
+## 306                                                                            Gravity furnace
+## 307                                                     Hot water or steam heat other than gas
+## 308                                                                               Wall furnace
+## 309                                                                                           
+## 310                                                                                           
+## 311                                                                                  Excellent
+## 312                                                                                       Good
+## 313                                                                            Average/Typical
+## 314                                                                                       Fair
+## 315                                                                                       Poor
+## 316                                                                                           
+## 317                                                                                           
+## 318                                                                                         No
+## 319                                                                                        Yes
+## 320                                                                                           
+## 321                                                                                           
+## 322                                                          Standard Circuit Breakers & Romex
+## 323                                        Fuse Box over 60 AMP and all Romex wiring (Average)
+## 324                                             60 AMP Fuse Box and mostly Romex wiring (Fair)
+## 325                                       60 AMP Fuse Box and mostly knob & tube wiring (poor)
+## 326                                                                                      Mixed
+## 327                                                                                           
+## 328                                                                                           
+## 329                                                                                           
+## 330                                                                                           
+## 331                                                                                           
+## 332                                                                                           
+## 333                                                                                           
+## 334                                                                                           
+## 335                                                                                           
+## 336                                                                                           
+## 337                                                                                           
+## 338                                                                                           
+## 339                                                                                           
+## 340                                                                                  Excellent
+## 341                                                                                       Good
+## 342                                                                            Typical/Average
+## 343                                                                                       Fair
+## 344                                                                                       Poor
+## 345                                                                                           
+## 346                                                                                           
+## 347                                                                                           
+## 348                                                                      Typical Functionality
+## 349                                                                         Minor Deductions 1
+## 350                                                                         Minor Deductions 2
+## 351                                                                        Moderate Deductions
+## 352                                                                         Major Deductions 1
+## 353                                                                         Major Deductions 2
+## 354                                                                           Severely Damaged
+## 355                                                                               Salvage only
+## 356                                                                                           
+## 357                                                                                           
+## 358                                                                                           
+## 359                                                  Excellent - Exceptional Masonry Fireplace
+## 360                                                     Good - Masonry Fireplace in main level
+## 361     Average - Prefabricated Fireplace in main living area or Masonry Fireplace in basement
+## 362                                                 Fair - Prefabricated Fireplace in basement
+## 363                                                                  Poor - Ben Franklin Stove
+## 364                                                                               No Fireplace
+## 365                                                                                           
+## 366                                                                                           
+## 367                                                                                           
+## 368                                                               More than one type of garage
+## 369                                                                           Attached to home
+## 370                                                                            Basement Garage
+## 371                          Built-In (Garage part of house - typically has room above garage)
+## 372                                                                                   Car Port
+## 373                                                                         Detached from home
+## 374                                                                                  No Garage
+## 375                                                                                           
+## 376                                                                                           
+## 377                                                                                           
+## 378                                                                                           
+## 379                                                                                   Finished
+## 380                                                                             Rough Finished
+## 381                                                                                 Unfinished
+## 382                                                                                  No Garage
+## 383                                                                                           
+## 384                                                                                           
+## 385                                                                                           
+## 386                                                                                           
+## 387                                                                                  Excellent
+## 388                                                                                       Good
+## 389                                                                            Typical/Average
+## 390                                                                                       Fair
+## 391                                                                                       Poor
+## 392                                                                                  No Garage
+## 393                                                                                           
+## 394                                                                                           
+## 395                                                                                  Excellent
+## 396                                                                                       Good
+## 397                                                                            Typical/Average
+## 398                                                                                       Fair
+## 399                                                                                       Poor
+## 400                                                                                  No Garage
+## 401                                                                                           
+## 402                                                                                           
+## 403                                                                                     Paved 
+## 404                                                                           Partial Pavement
+## 405                                                                                Dirt/Gravel
+## 406                                                                                           
+## 407                                                                                           
+## 408                                                                                           
+## 409                                                                                           
+## 410                                                                                           
+## 411                                                                                           
+## 412                                                                                           
+## 413                                                                                           
+## 414                                                                                           
+## 415                                                                                  Excellent
+## 416                                                                                       Good
+## 417                                                                            Average/Typical
+## 418                                                                                       Fair
+## 419                                                                                    No Pool
+## 420                                                                                           
+## 421                                                                                           
+## 422                                                                                           
+## 423                                                                               Good Privacy
+## 424                                                                            Minimum Privacy
+## 425                                                                                  Good Wood
+## 426                                                                          Minimum Wood/Wire
+## 427                                                                                   No Fence
+## 428                                                                                           
+## 429                                                                                           
+## 430                                                                                           
+## 431                                                                                   Elevator
+## 432                                            2nd Garage (if not described in garage section)
+## 433                                                                                      Other
+## 434                                                                         Shed (over 100 SF)
+## 435                                                                               Tennis Court
+## 436                                                                                       None
+## 437                                                                                           
+## 438                                                                                           
+## 439                                                                                           
+## 440                                                                                           
+## 441                                                                                           
+## 442                                                                                           
+## 443                                                               Warranty Deed - Conventional
+## 444                                                                       Warranty Deed - Cash
+## 445                                                                    Warranty Deed - VA Loan
+## 446                                                             Home just constructed and sold
+## 447                                                                  Court Officer Deed/Estate
+## 448                                                    Contract 15% Down payment regular terms
+## 449                                                 Contract Low Down payment and low interest
+## 450                                                                      Contract Low Interest
+## 451                                                                          Contract Low Down
+## 452                                                                                      Other
+## 453                                                                                           
+## 454                                                                                           
+## 455                                                                                Normal Sale
+## 456                                            Abnormal Sale -  trade, foreclosure, short sale
+## 457                                                                    Adjoining Land Purchase
+## 458 Allocation - two linked properties with separate deeds, typically condo with a garage unit
+## 459                                                                Sale between family members
+## 460                      Home was not completed when last assessed (associated with New Homes)
+\end{verbatim}
+
+\hypertarget{data-overviewcharateristic}{%
+\paragraph{Data
+Overview/Charateristic}\label{data-overviewcharateristic}}
+
+\begin{verbatim}
+##   Id MSSubClass MSZoning LotFrontage LotArea Street Alley LotShape LandContour
+## 1  1         60       RL          65    8450   Pave  <NA>      Reg         Lvl
+## 2  2         20       RL          80    9600   Pave  <NA>      Reg         Lvl
+## 3  3         60       RL          68   11250   Pave  <NA>      IR1         Lvl
+## 4  4         70       RL          60    9550   Pave  <NA>      IR1         Lvl
+## 5  5         60       RL          84   14260   Pave  <NA>      IR1         Lvl
+## 6  6         50       RL          85   14115   Pave  <NA>      IR1         Lvl
+##   Utilities LotConfig LandSlope Neighborhood Condition1 Condition2 BldgType
+## 1    AllPub    Inside       Gtl      CollgCr       Norm       Norm     1Fam
+## 2    AllPub       FR2       Gtl      Veenker      Feedr       Norm     1Fam
+## 3    AllPub    Inside       Gtl      CollgCr       Norm       Norm     1Fam
+## 4    AllPub    Corner       Gtl      Crawfor       Norm       Norm     1Fam
+## 5    AllPub       FR2       Gtl      NoRidge       Norm       Norm     1Fam
+## 6    AllPub    Inside       Gtl      Mitchel       Norm       Norm     1Fam
+##   HouseStyle OverallQual OverallCond YearBuilt YearRemodAdd RoofStyle RoofMatl
+## 1     2Story           7           5      2003         2003     Gable  CompShg
+## 2     1Story           6           8      1976         1976     Gable  CompShg
+## 3     2Story           7           5      2001         2002     Gable  CompShg
+## 4     2Story           7           5      1915         1970     Gable  CompShg
+## 5     2Story           8           5      2000         2000     Gable  CompShg
+## 6     1.5Fin           5           5      1993         1995     Gable  CompShg
+##   Exterior1st Exterior2nd MasVnrType MasVnrArea ExterQual ExterCond Foundation
+## 1     VinylSd     VinylSd    BrkFace        196        Gd        TA      PConc
+## 2     MetalSd     MetalSd       None          0        TA        TA     CBlock
+## 3     VinylSd     VinylSd    BrkFace        162        Gd        TA      PConc
+## 4     Wd Sdng     Wd Shng       None          0        TA        TA     BrkTil
+## 5     VinylSd     VinylSd    BrkFace        350        Gd        TA      PConc
+## 6     VinylSd     VinylSd       None          0        TA        TA       Wood
+##   BsmtQual BsmtCond BsmtExposure BsmtFinType1 BsmtFinSF1 BsmtFinType2
+## 1       Gd       TA           No          GLQ        706          Unf
+## 2       Gd       TA           Gd          ALQ        978          Unf
+## 3       Gd       TA           Mn          GLQ        486          Unf
+## 4       TA       Gd           No          ALQ        216          Unf
+## 5       Gd       TA           Av          GLQ        655          Unf
+## 6       Gd       TA           No          GLQ        732          Unf
+##   BsmtFinSF2 BsmtUnfSF TotalBsmtSF Heating HeatingQC CentralAir Electrical
+## 1          0       150         856    GasA        Ex          Y      SBrkr
+## 2          0       284        1262    GasA        Ex          Y      SBrkr
+## 3          0       434         920    GasA        Ex          Y      SBrkr
+## 4          0       540         756    GasA        Gd          Y      SBrkr
+## 5          0       490        1145    GasA        Ex          Y      SBrkr
+## 6          0        64         796    GasA        Ex          Y      SBrkr
+##   X1stFlrSF X2ndFlrSF LowQualFinSF GrLivArea BsmtFullBath BsmtHalfBath FullBath
+## 1       856       854            0      1710            1            0        2
+## 2      1262         0            0      1262            0            1        2
+## 3       920       866            0      1786            1            0        2
+## 4       961       756            0      1717            1            0        1
+## 5      1145      1053            0      2198            1            0        2
+## 6       796       566            0      1362            1            0        1
+##   HalfBath BedroomAbvGr KitchenAbvGr KitchenQual TotRmsAbvGrd Functional
+## 1        1            3            1          Gd            8        Typ
+## 2        0            3            1          TA            6        Typ
+## 3        1            3            1          Gd            6        Typ
+## 4        0            3            1          Gd            7        Typ
+## 5        1            4            1          Gd            9        Typ
+## 6        1            1            1          TA            5        Typ
+##   Fireplaces FireplaceQu GarageType GarageYrBlt GarageFinish GarageCars
+## 1          0        <NA>     Attchd        2003          RFn          2
+## 2          1          TA     Attchd        1976          RFn          2
+## 3          1          TA     Attchd        2001          RFn          2
+## 4          1          Gd     Detchd        1998          Unf          3
+## 5          1          TA     Attchd        2000          RFn          3
+## 6          0        <NA>     Attchd        1993          Unf          2
+##   GarageArea GarageQual GarageCond PavedDrive WoodDeckSF OpenPorchSF
+## 1        548         TA         TA          Y          0          61
+## 2        460         TA         TA          Y        298           0
+## 3        608         TA         TA          Y          0          42
+## 4        642         TA         TA          Y          0          35
+## 5        836         TA         TA          Y        192          84
+## 6        480         TA         TA          Y         40          30
+##   EnclosedPorch X3SsnPorch ScreenPorch PoolArea PoolQC Fence MiscFeature
+## 1             0          0           0        0   <NA>  <NA>        <NA>
+## 2             0          0           0        0   <NA>  <NA>        <NA>
+## 3             0          0           0        0   <NA>  <NA>        <NA>
+## 4           272          0           0        0   <NA>  <NA>        <NA>
+## 5             0          0           0        0   <NA>  <NA>        <NA>
+## 6             0        320           0        0   <NA> MnPrv        Shed
+##   MiscVal MoSold YrSold SaleType SaleCondition SalePrice
+## 1       0      2   2008       WD        Normal    208500
+## 2       0      5   2007       WD        Normal    181500
+## 3       0      9   2008       WD        Normal    223500
+## 4       0      2   2006       WD       Abnorml    140000
+## 5       0     12   2008       WD        Normal    250000
+## 6     700     10   2009       WD        Normal    143000
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: `gather_()` was deprecated in tidyr 1.2.0.
+## Please use `gather()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+This data is composed of 80 features for 1460 observations. The
+datatypes are mixed of integer and character. The target variable or the
+variable of interest is `SalePrice'. According to the dictionary,
+`SalePrice' is the price at which a house was sold. Other variables are
+criteria used to derive the price of the house. We believe 81 variables
+for a price determination is excessive. Not all these variable are
+relevant/pertinent to the target variable. In addition, some variables
+have missing values. Therefore, we will need to reduce the number of
+feature by pertinence to SalePrice and cleaning the missing values.
+
+\hypertarget{data-cleaning}{%
+\subsubsection{Data Cleaning}\label{data-cleaning}}
+
+Let's see the missing values.
+
+\begin{verbatim}
+## 
+## Attaching package: 'skimr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:naniar':
+## 
+##     n_complete
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'lubridate'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:arules':
+## 
+##     intersect, setdiff, union
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:tsibble':
+## 
+##     interval
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     date, intersect, setdiff, union
+\end{verbatim}
+
+\begin{verbatim}
+## Selecting by numeric.p100
+\end{verbatim}
+
+\begin{verbatim}
+## # A tibble: 13 x 14
+##    n_missing complete_rate character.min character.max character.empty
+##        <int>         <dbl>         <int>         <int>           <int>
+##  1         0         1                NA            NA              NA
+##  2         0         1                NA            NA              NA
+##  3         0         1                NA            NA              NA
+##  4         0         1                NA            NA              NA
+##  5         0         1                NA            NA              NA
+##  6         0         1                NA            NA              NA
+##  7         0         1                NA            NA              NA
+##  8         0         1                NA            NA              NA
+##  9         0         1                NA            NA              NA
+## 10        81         0.945            NA            NA              NA
+## 11         0         1                NA            NA              NA
+## 12         0         1                NA            NA              NA
+## 13         0         1                NA            NA              NA
+## # ... with 9 more variables: character.n_unique <int>,
+## #   character.whitespace <int>, numeric.mean <dbl>, numeric.sd <dbl>,
+## #   numeric.p0 <dbl>, numeric.p25 <dbl>, numeric.p50 <dbl>, numeric.p75 <dbl>,
+## #   numeric.p100 <dbl>
+\end{verbatim}
+
+There are 43 character(categorical) variables and 38 numerical
+variables. We know there are 1460 observations, so seeing the number (or
+percent) missing values per variable can give us an idea of the cleaning
+approach.
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+& x \\
+\midrule
+\endhead
+Id & 0 \\
+MSSubClass & 0 \\
+MSZoning & 0 \\
+LotFrontage & 259 \\
+LotArea & 0 \\
+Street & 0 \\
+Alley & 1369 \\
+LotShape & 0 \\
+LandContour & 0 \\
+Utilities & 0 \\
+LotConfig & 0 \\
+LandSlope & 0 \\
+Neighborhood & 0 \\
+Condition1 & 0 \\
+Condition2 & 0 \\
+BldgType & 0 \\
+HouseStyle & 0 \\
+OverallQual & 0 \\
+OverallCond & 0 \\
+YearBuilt & 0 \\
+YearRemodAdd & 0 \\
+RoofStyle & 0 \\
+RoofMatl & 0 \\
+Exterior1st & 0 \\
+Exterior2nd & 0 \\
+MasVnrType & 8 \\
+MasVnrArea & 8 \\
+ExterQual & 0 \\
+ExterCond & 0 \\
+Foundation & 0 \\
+BsmtQual & 37 \\
+BsmtCond & 37 \\
+BsmtExposure & 38 \\
+BsmtFinType1 & 37 \\
+BsmtFinSF1 & 0 \\
+BsmtFinType2 & 38 \\
+BsmtFinSF2 & 0 \\
+BsmtUnfSF & 0 \\
+TotalBsmtSF & 0 \\
+Heating & 0 \\
+\bottomrule
+\end{longtable}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+We selected half of the variables. Let's see the other half.
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+& x \\
+\midrule
+\endhead
+HeatingQC & 0 \\
+CentralAir & 0 \\
+Electrical & 1 \\
+X1stFlrSF & 0 \\
+X2ndFlrSF & 0 \\
+LowQualFinSF & 0 \\
+GrLivArea & 0 \\
+BsmtFullBath & 0 \\
+BsmtHalfBath & 0 \\
+FullBath & 0 \\
+HalfBath & 0 \\
+BedroomAbvGr & 0 \\
+KitchenAbvGr & 0 \\
+KitchenQual & 0 \\
+TotRmsAbvGrd & 0 \\
+Functional & 0 \\
+Fireplaces & 0 \\
+FireplaceQu & 690 \\
+GarageType & 81 \\
+GarageYrBlt & 81 \\
+GarageFinish & 81 \\
+GarageCars & 0 \\
+GarageArea & 0 \\
+GarageQual & 81 \\
+GarageCond & 81 \\
+PavedDrive & 0 \\
+WoodDeckSF & 0 \\
+OpenPorchSF & 0 \\
+EnclosedPorch & 0 \\
+X3SsnPorch & 0 \\
+ScreenPorch & 0 \\
+PoolArea & 0 \\
+PoolQC & 1453 \\
+Fence & 1179 \\
+MiscFeature & 1406 \\
+MiscVal & 0 \\
+MoSold & 0 \\
+YrSold & 0 \\
+SaleType & 0 \\
+SaleCondition & 0 \\
+SalePrice & 0 \\
+\bottomrule
+\end{longtable}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+By visual inspection, we can remove these variables: PoolQC, Fence,
+Alley, MiscFeature, FireplaceQu, LotFrontage. because missing too many
+value\ldots it probably means these variables are not important \ldots{}
+houses that have these variables with values are probably
+extra..extra\ldots or too special\ldots{}
+
+LotFrontage = LotFrontage: Linear feet of street connected to property.
+We want to remove this variable due to the 17.4\% missing values and the
+fact that every house is built under the city regulation.
+
+We will remove variable `Id'. There is no need for it or because it is
+just an indication for record purpose.
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+& x \\
+\midrule
+\endhead
+LotFrontage & 259 \\
+Alley & 1369 \\
+MasVnrType & 8 \\
+MasVnrArea & 8 \\
+BsmtQual & 37 \\
+BsmtCond & 37 \\
+BsmtExposure & 38 \\
+BsmtFinType1 & 37 \\
+BsmtFinType2 & 38 \\
+Electrical & 1 \\
+FireplaceQu & 690 \\
+GarageType & 81 \\
+GarageYrBlt & 81 \\
+GarageFinish & 81 \\
+GarageQual & 81 \\
+GarageCond & 81 \\
+PoolQC & 1453 \\
+Fence & 1179 \\
+MiscFeature & 1406 \\
+\bottomrule
+\end{longtable}
+
+Above are variables with missing values greater than 0. I like this
+already!
+
+This is where the benefit of having friends who are in housing for sale
+or construction count.
+
+Next, we will evaluate (does it really matter? can it be done easily?
+does it cost a lot ?) all other variables with missing values
+
+GarageFinish (81 missing values): Interior finish of the
+garage\ldots average homebuyers don't care about it\ldots{} the
+condition of the garage is sufficient \ldots{} remove
+
+GarageQual (81 missing values): Garage quality, this might mean the
+quality of the materials used to build the garage. Remove\ldots{}
+
+GarageCond (81 missing values): Garage condition, this might mean the
+condition(look) at the time the house is sold.
+
+GarageType(81 missing values): garage location\ldots\ldots garage
+condition is enough \ldots.remove
+
+GarageYrBlt(81 missing values): garage year built\ldots same with
+yearbuilt\ldots remove
+
+MasVnrType(07 missing values): Masonry veneer type\ldots the type of
+material used to construct the house(bricks, stone\ldots)\ldots we can
+keep it for now
+
+MasVnrArea(07 missing values): Masonry veneer area in square
+feet\ldots this is the kind of work homebuyers won't do. Because it
+involve doing the math to find the ratio of the veneer area covered Vs.
+not covered\ldots.remove
+
+BsmtQual( 037 missing values): Evaluates the height of the
+basement\ldots will be removed because another variable described the
+same thing.
+
+BsmtCond (37 missing values): Evaluates the general condition of the
+basement\ldots.we can keep\ldots{}
+
+BsmtExposure(38 missing values): Refers to walkout or garden level
+walls..average homebuyers don't care about it. remove
+
+BsmtFinType1 (37 missing values): Rating of basement finished
+area\ldots described already\ldots remove
+
+BsmtFinType2 ( 38 missing values): Type 1 finished square feet\ldots no
+tricky math for buyer\ldots{} remove
+
+Electrical\ldots we will only remove the 01 missing values\ldots no
+hurts
+
+\begin{verbatim}
+##  [1] "MSSubClass"    "MSZoning"      "LotArea"       "Street"       
+##  [5] "LotShape"      "LandContour"   "Utilities"     "LotConfig"    
+##  [9] "LandSlope"     "Neighborhood"  "Condition1"    "Condition2"   
+## [13] "BldgType"      "HouseStyle"    "OverallQual"   "OverallCond"  
+## [17] "YearBuilt"     "YearRemodAdd"  "RoofStyle"     "RoofMatl"     
+## [21] "Exterior1st"   "Exterior2nd"   "MasVnrType"    "ExterQual"    
+## [25] "ExterCond"     "Foundation"    "BsmtCond"      "BsmtFinSF1"   
+## [29] "BsmtFinSF2"    "BsmtUnfSF"     "TotalBsmtSF"   "Heating"      
+## [33] "HeatingQC"     "CentralAir"    "Electrical"    "X1stFlrSF"    
+## [37] "X2ndFlrSF"     "LowQualFinSF"  "GrLivArea"     "BsmtFullBath" 
+## [41] "BsmtHalfBath"  "FullBath"      "HalfBath"      "BedroomAbvGr" 
+## [45] "KitchenAbvGr"  "KitchenQual"   "TotRmsAbvGrd"  "Functional"   
+## [49] "Fireplaces"    "GarageCars"    "GarageArea"    "GarageCond"   
+## [53] "PavedDrive"    "WoodDeckSF"    "OpenPorchSF"   "EnclosedPorch"
+## [57] "X3SsnPorch"    "ScreenPorch"   "PoolArea"      "MiscVal"      
+## [61] "MoSold"        "YrSold"        "SaleType"      "SaleCondition"
+## [65] "SalePrice"
+\end{verbatim}
+
+Above list is the name of the remaining variables after we removed the
+first set as described early. We continue to remove by pertinence (if it
+seems like extra or one can live without it in the area\ldots) to the
+sale price.
+
+LandContour,LotShape, Street, LotConfig, LandSlope, Condition2,
+RoofStyle, Exterior2nd, OverallQual, Foundation, TotalBsmtSF,BsmtUnfSF,
+Heating, Electrical, X1stFlrSF, X2ndFlrSF, LowQualFinSF, BsmtFullBath,
+BsmtHalfBath, TotRmsAbvGrd, PavedDrive, EnclosedPorch, 3SsnPorch,
+ScreenPorch, MoSold,MSSubClass,Condition1
+
+\begin{verbatim}
+##  [1] "MSZoning"      "LotArea"       "Utilities"     "Neighborhood" 
+##  [5] "BldgType"      "HouseStyle"    "OverallCond"   "YearBuilt"    
+##  [9] "YearRemodAdd"  "RoofMatl"      "Exterior1st"   "MasVnrType"   
+## [13] "ExterQual"     "ExterCond"     "BsmtCond"      "BsmtFinSF1"   
+## [17] "BsmtFinSF2"    "HeatingQC"     "CentralAir"    "X1stFlrSF"    
+## [21] "GrLivArea"     "FullBath"      "HalfBath"      "BedroomAbvGr" 
+## [25] "KitchenAbvGr"  "KitchenQual"   "Functional"    "Fireplaces"   
+## [29] "GarageCars"    "GarageArea"    "GarageCond"    "WoodDeckSF"   
+## [33] "OpenPorchSF"   "PoolArea"      "MiscVal"       "YrSold"       
+## [37] "SaleType"      "SaleCondition" "SalePrice"
+\end{verbatim}
+
+\begin{verbatim}
+## MasVnrType   BsmtCond GarageCond 
+##          8         37         81
+\end{verbatim}
+
+We significantly reduced the number of variable by nearly half. No need
+to do imputation by mean or other numerical imputations. We just need to
+replace the value according to the definition of the variable and remove
+the row where `NA' has no meaning and it is very low missing values (ex:
+10 missing values will no infere on 1460 observations)
+
+\begin{verbatim}
+##  [1] "MSZoning"      "LotArea"       "Utilities"     "Neighborhood" 
+##  [5] "BldgType"      "HouseStyle"    "OverallCond"   "YearBuilt"    
+##  [9] "YearRemodAdd"  "RoofMatl"      "Exterior1st"   "MasVnrType"   
+## [13] "ExterQual"     "ExterCond"     "BsmtCond"      "BsmtFinSF1"   
+## [17] "BsmtFinSF2"    "HeatingQC"     "CentralAir"    "X1stFlrSF"    
+## [21] "GrLivArea"     "FullBath"      "HalfBath"      "BedroomAbvGr" 
+## [25] "KitchenAbvGr"  "KitchenQual"   "Functional"    "Fireplaces"   
+## [29] "GarageCars"    "GarageArea"    "GarageCond"    "WoodDeckSF"   
+## [33] "OpenPorchSF"   "PoolArea"      "MiscVal"       "YrSold"       
+## [37] "SaleType"      "SaleCondition" "SalePrice"
+\end{verbatim}
+
+Remained 36 variables after cleaning\ldots{} let's convert character
+variables to categorical ones.
+
+\hypertarget{exploratory-data-analysis-eda}{%
+\subsubsection{Exploratory Data Analysis
+(EDA)}\label{exploratory-data-analysis-eda}}
+
+\begin{verbatim}
+## 
+## Attaching package: 'psych'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:ggplot2':
+## 
+##     %+%, alpha
+\end{verbatim}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.1064}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0355}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0355}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0922}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0922}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0638}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0922}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0780}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0426}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0496}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0496}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0780}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0922}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 26\tabcolsep) * \real{0.0922}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+vars
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+n
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+mean
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+sd
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+median
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+trimmed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+mad
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+max
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+range
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+skew
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+kurtosis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+se
+\end{minipage} \\
+\midrule
+\endhead
+MSZoning* & 1 & 1452 & 4.033058e+00 & 6.269907e-01 & 4.0 & 4.062823e+00
+& 0.0000 & 1 & 5 & 4 & -1.7341136 & 6.4223786 & 0.0164542 \\
+LotArea & 2 & 1452 & 1.050728e+04 & 9.989564e+03 & 9478.5 & 9.560115e+03
+& 2962.2348 & 1300 & 215245 & 213945 & 12.2147550 & 202.7382100 &
+262.1580559 \\
+Utilities* & 3 & 1452 & 1.000689e+00 & 2.624320e-02 & 1.0 & 1.000000e+00
+& 0.0000 & 1 & 2 & 1 & 38.0264243 & 1445.0041308 & 0.0006887 \\
+Neighborhood* & 4 & 1452 & 1.313912e+01 & 5.889512e+00 & 13.0 &
+1.309380e+01 & 7.4130 & 1 & 25 & 24 & 0.0198860 & -1.0506232 &
+0.1545596 \\
+BldgType* & 5 & 1452 & 1.493113e+00 & 1.197554e+00 & 1.0 & 1.144578e+00
+& 0.0000 & 1 & 5 & 4 & 2.2406039 & 3.4060800 & 0.0314276 \\
+HouseStyle* & 6 & 1452 & 4.037879e+00 & 1.913519e+00 & 3.0 &
+4.028399e+00 & 1.4826 & 1 & 8 & 7 & 0.3058160 & -0.9646592 &
+0.0502169 \\
+OverallCond & 7 & 1452 & 5.579201e+00 & 1.113136e+00 & 5.0 &
+5.481067e+00 & 0.0000 & 1 & 9 & 8 & 0.6934936 & 1.0807585 & 0.0292122 \\
+YearBuilt & 8 & 1452 & 1.971116e+03 & 3.019376e+01 & 1972.0 &
+1.973943e+03 & 37.0650 & 1872 & 2010 & 138 & -0.6076580 & -0.4482779 &
+0.7923807 \\
+YearRemodAdd & 9 & 1452 & 1.984775e+03 & 2.065247e+01 & 1993.0 &
+1.986256e+03 & 19.2738 & 1950 & 2010 & 60 & -0.4962541 & -1.2807746 &
+0.5419867 \\
+RoofMatl* & 10 & 1452 & 2.075758e+00 & 6.007500e-01 & 2.0 & 2.000000e+00
+& 0.0000 & 1 & 8 & 7 & 8.0694933 & 65.8874243 & 0.0157656 \\
+Exterior1st* & 11 & 1452 & 1.062052e+01 & 3.197594e+00 & 13.0 &
+1.092427e+01 & 1.4826 & 1 & 15 & 14 & -0.7230384 & -0.3648052 &
+0.0839151 \\
+MasVnrType* & 12 & 1452 & 2.761019e+00 & 6.157107e-01 & 3.0 &
+2.728916e+00 & 0.0000 & 1 & 4 & 3 & -0.0673056 & -0.1344926 &
+0.0161582 \\
+ExterQual* & 13 & 1452 & 3.544077e+00 & 6.916750e-01 & 4.0 &
+3.654905e+00 & 0.0000 & 1 & 4 & 3 & -1.8375828 & 3.9126787 &
+0.0181518 \\
+ExterCond* & 14 & 1452 & 4.732094e+00 & 7.335536e-01 & 5.0 &
+4.944062e+00 & 0.0000 & 1 & 5 & 4 & -2.5500640 & 5.2369125 &
+0.0192508 \\
+BsmtCond* & 15 & 1452 & 4.691460e+00 & 9.493638e-01 & 5.0 & 4.996558e+00
+& 0.0000 & 1 & 5 & 4 & -2.9401349 & 7.1989685 & 0.0249143 \\
+BsmtFinSF1 & 16 & 1452 & 4.419704e+02 & 4.553603e+02 & 381.0 &
+3.842900e+02 & 564.8706 & 0 & 5644 & 5644 & 1.6993684 & 11.2275285 &
+11.9501082 \\
+BsmtFinSF2 & 17 & 1452 & 4.680579e+01 & 1.617262e+02 & 0.0 &
+1.492255e+00 & 0.0000 & 0 & 1474 & 1474 & 4.2331421 & 19.8767340 &
+4.2442131 \\
+HeatingQC* & 18 & 1452 & 2.544077e+00 & 1.739828e+00 & 1.0 &
+2.430293e+00 & 0.0000 & 1 & 5 & 4 & 0.4761525 & -1.5173517 &
+0.0456586 \\
+CentralAir* & 19 & 1452 & 1.934573e+00 & 2.473630e-01 & 2.0 &
+2.000000e+00 & 0.0000 & 1 & 2 & 1 & -3.5112263 & 10.3358300 &
+0.0064916 \\
+X1stFlrSF & 20 & 1452 & 1.161271e+03 & 3.850184e+02 & 1086.0 &
+1.129282e+03 & 347.6697 & 334 & 4692 & 4358 & 1.3705592 & 5.7935362 &
+10.1041132 \\
+GrLivArea & 21 & 1452 & 1.514092e+03 & 5.256278e+02 & 1461.5 &
+1.466049e+03 & 483.3276 & 334 & 5642 & 5308 & 1.3715369 & 4.9011921 &
+13.7941514 \\
+FullBath & 22 & 1452 & 1.562672e+00 & 5.502313e-01 & 2.0 & 1.558520e+00
+& 0.0000 & 0 & 3 & 3 & 0.0363711 & -0.8723593 & 0.0144398 \\
+HalfBath & 23 & 1452 & 3.815427e-01 & 5.026637e-01 & 0.0 & 3.416523e-01
+& 0.0000 & 0 & 2 & 2 & 0.6816203 & -1.0673211 & 0.0131915 \\
+BedroomAbvGr & 24 & 1452 & 2.867080e+00 & 8.148122e-01 & 3.0 &
+2.852840e+00 & 0.0000 & 0 & 8 & 8 & 0.2171317 & 2.2390257 & 0.0213833 \\
+KitchenAbvGr & 25 & 1452 & 1.046143e+00 & 2.194982e-01 & 1.0 &
+1.000000e+00 & 0.0000 & 0 & 3 & 3 & 4.5052679 & 21.7240175 &
+0.0057603 \\
+KitchenQual* & 26 & 1452 & 3.342287e+00 & 8.297051e-01 & 4.0 &
+3.506885e+00 & 0.0000 & 1 & 4 & 3 & -1.4239365 & 1.7256217 &
+0.0217741 \\
+Functional* & 27 & 1452 & 6.752066e+00 & 9.705320e-01 & 7.0 &
+7.000000e+00 & 0.0000 & 1 & 7 & 6 & -4.0811771 & 16.4229147 &
+0.0254699 \\
+Fireplaces & 28 & 1452 & 6.122590e-01 & 6.434218e-01 & 1.0 &
+5.344234e-01 & 1.4826 & 0 & 3 & 3 & 0.6473945 & -0.2166199 &
+0.0168854 \\
+GarageCars & 29 & 1452 & 1.765151e+00 & 7.484957e-01 & 2.0 &
+1.771945e+00 & 0.0000 & 0 & 4 & 4 & -0.3374301 & 0.2003861 &
+0.0196429 \\
+GarageArea & 30 & 1452 & 4.724752e+02 & 2.141064e+02 & 478.0 &
+4.692849e+02 & 174.9468 & 0 & 1418 & 1418 & 0.1829216 & 0.8988780 &
+5.6188357 \\
+GarageCond* & 31 & 1452 & 5.761708e+00 & 8.046860e-01 & 6.0 &
+6.000000e+00 & 0.0000 & 1 & 6 & 5 & -3.5643891 & 12.3529271 &
+0.0211175 \\
+WoodDeckSF & 32 & 1452 & 9.441667e+01 & 1.253937e+02 & 0.0 &
+7.194234e+01 & 0.0000 & 0 & 857 & 857 & 1.5391213 & 2.9784831 &
+3.2907314 \\
+OpenPorchSF & 33 & 1452 & 4.639050e+01 & 6.604862e+01 & 24.0 &
+3.301291e+01 & 35.5824 & 0 & 547 & 547 & 2.3807985 & 8.6198899 &
+1.7333267 \\
+PoolArea & 34 & 1452 & 2.774105e+00 & 4.028739e+01 & 0.0 & 0.000000e+00
+& 0.0000 & 0 & 738 & 738 & 14.7566829 & 220.9454623 & 1.0572698 \\
+MiscVal & 35 & 1452 & 4.372865e+01 & 4.974783e+02 & 0.0 & 0.000000e+00 &
+0.0000 & 0 & 15500 & 15500 & 24.3594783 & 693.8077959 & 13.0554190 \\
+YrSold & 36 & 1452 & 2.007815e+03 & 1.328927e+00 & 2008.0 & 2.007769e+03
+& 1.4826 & 2006 & 2010 & 4 & 0.0956796 & -1.1956650 & 0.0348753 \\
+SaleType* & 37 & 1452 & 8.511019e+00 & 1.563458e+00 & 9.0 & 8.925129e+00
+& 0.0000 & 1 & 9 & 8 & -3.8350611 & 14.5699843 & 0.0410301 \\
+SaleCondition* & 38 & 1452 & 4.768595e+00 & 1.101421e+00 & 5.0 &
+5.000000e+00 & 0.0000 & 1 & 6 & 5 & -2.7410913 & 6.8301526 &
+0.0289048 \\
+SalePrice & 39 & 1452 & 1.806151e+05 & 7.928554e+04 & 162700.0 &
+1.705286e+05 & 55894.0200 & 34900 & 755000 & 720100 & 1.8801536 &
+6.5401878 & 2080.7058509 \\
+\bottomrule
+\end{longtable}
+
+\begin{verbatim}
+## No id variables; using all as measure variables
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+Above is the distribution of numerical variables\ldots yearsold looks
+like many years counted. in fact, those variables with multiple mode,
+mean the variable have a set of of values that repeat. Hard to see off
+values (outliers).
+
+below is the distribution of categorical variables, not all them will be
+plot because some of them have too many levels to be plotted all at
+once\ldots maybe there is another technique
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-15-1.pdf}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-16-1.pdf}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-18-1.pdf}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-20-1.pdf}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-21-1.pdf}
+
+\begin{verbatim}
+##  [1] "MSZoning"      "LotArea"       "Utilities"     "Neighborhood" 
+##  [5] "BldgType"      "HouseStyle"    "OverallCond"   "YearBuilt"    
+##  [9] "YearRemodAdd"  "RoofMatl"      "Exterior1st"   "MasVnrType"   
+## [13] "ExterQual"     "ExterCond"     "BsmtCond"      "BsmtFinSF1"   
+## [17] "BsmtFinSF2"    "HeatingQC"     "CentralAir"    "X1stFlrSF"    
+## [21] "GrLivArea"     "FullBath"      "HalfBath"      "BedroomAbvGr" 
+## [25] "KitchenAbvGr"  "KitchenQual"   "Functional"    "Fireplaces"   
+## [29] "GarageCars"    "GarageArea"    "GarageCond"    "WoodDeckSF"   
+## [33] "OpenPorchSF"   "PoolArea"      "MiscVal"       "YrSold"       
+## [37] "SaleType"      "SaleCondition" "SalePrice"
+\end{verbatim}
+
+The way we visualize these categorical variables is that some of them
+can be redefined numerical since the categorical level in some of them
+are null or close to null. Potentially use some rating\ldots{} 0 means
+nothing 1 means poor and so on with \ldots2, 3, 4, 5..
+
+Of course this is not the only way to transform them\ldots{}
+
+\hypertarget{feature-engineering}{%
+\subsubsection{Feature Engineering}\label{feature-engineering}}
+
+\vspace
+
+Let's see the range in the variables years\ldots{}
+
+\begin{verbatim}
+## The earliest house was sold in  2006
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-22-1.pdf}
+
+Another way of seeing the houses sold in 2006\ldots{}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-23-1.pdf}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-24-1.pdf}
+
+let's see some values
+
+\begin{verbatim}
+## 
+## 
+## The latest house was sold in  2010
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## 
+## The earliest house was built in  1872
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## 
+## The latest house was built in  2010
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## 
+## The house that was the first to be rebuilt was in  1950
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## 
+## The house that was latest to be rebuilt was in  2010
+\end{verbatim}
+
+Let's see the distribution at which house were sold.
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq \\
+\midrule
+\endhead
+2006 & 313 \\
+2007 & 327 \\
+2008 & 301 \\
+2009 & 337 \\
+2010 & 174 \\
+\bottomrule
+\end{longtable}
+
+Not sure what to think of the variables with years\ldots does it affect
+the target variable? Let's transform categorical to factor.
+
+\begin{verbatim}
+## Rows: 1,452
+## Columns: 39
+## $ MSZoning      <fct> RL, RL, RL, RL, RL, RL, RL, RL, RM, RL, RL, RL, RL, RL, ~
+## $ LotArea       <int> 8450, 9600, 11250, 9550, 14260, 14115, 10084, 10382, 612~
+## $ Utilities     <fct> AllPub, AllPub, AllPub, AllPub, AllPub, AllPub, AllPub, ~
+## $ Neighborhood  <fct> CollgCr, Veenker, CollgCr, Crawfor, NoRidge, Mitchel, So~
+## $ BldgType      <fct> 1Fam, 1Fam, 1Fam, 1Fam, 1Fam, 1Fam, 1Fam, 1Fam, 1Fam, 2f~
+## $ HouseStyle    <fct> 2Story, 1Story, 2Story, 2Story, 2Story, 1.5Fin, 1Story, ~
+## $ OverallCond   <int> 5, 8, 5, 5, 5, 5, 5, 6, 5, 6, 5, 5, 6, 5, 5, 8, 7, 5, 5,~
+## $ YearBuilt     <int> 2003, 1976, 2001, 1915, 2000, 1993, 2004, 1973, 1931, 19~
+## $ YearRemodAdd  <int> 2003, 1976, 2002, 1970, 2000, 1995, 2005, 1973, 1950, 19~
+## $ RoofMatl      <fct> CompShg, CompShg, CompShg, CompShg, CompShg, CompShg, Co~
+## $ Exterior1st   <fct> VinylSd, MetalSd, VinylSd, Wd Sdng, VinylSd, VinylSd, Vi~
+## $ MasVnrType    <fct> BrkFace, None, BrkFace, None, BrkFace, None, Stone, Ston~
+## $ ExterQual     <fct> Gd, TA, Gd, TA, Gd, TA, Gd, TA, TA, TA, TA, Ex, TA, Gd, ~
+## $ ExterCond     <fct> TA, TA, TA, TA, TA, TA, TA, TA, TA, TA, TA, TA, TA, TA, ~
+## $ BsmtCond      <fct> TA, TA, TA, Gd, TA, TA, TA, TA, TA, TA, TA, TA, TA, TA, ~
+## $ BsmtFinSF1    <int> 706, 978, 486, 216, 655, 732, 1369, 859, 0, 851, 906, 99~
+## $ BsmtFinSF2    <int> 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0~
+## $ HeatingQC     <fct> Ex, Ex, Ex, Gd, Ex, Ex, Ex, Ex, Gd, Ex, Ex, Ex, TA, Ex, ~
+## $ CentralAir    <fct> Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y, Y,~
+## $ X1stFlrSF     <int> 856, 1262, 920, 961, 1145, 796, 1694, 1107, 1022, 1077, ~
+## $ GrLivArea     <int> 1710, 1262, 1786, 1717, 2198, 1362, 1694, 2090, 1774, 10~
+## $ FullBath      <int> 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 1, 3, 1, 2, 1, 1, 1, 2, 1,~
+## $ HalfBath      <int> 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,~
+## $ BedroomAbvGr  <int> 3, 3, 3, 3, 4, 1, 3, 3, 2, 2, 3, 4, 2, 3, 2, 2, 2, 2, 3,~
+## $ KitchenAbvGr  <int> 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1,~
+## $ KitchenQual   <fct> Gd, TA, Gd, Gd, Gd, TA, Gd, TA, TA, TA, TA, Ex, TA, Gd, ~
+## $ Functional    <fct> Typ, Typ, Typ, Typ, Typ, Typ, Typ, Typ, Min1, Typ, Typ, ~
+## $ Fireplaces    <int> 0, 1, 1, 1, 1, 0, 1, 2, 2, 2, 0, 2, 0, 1, 1, 0, 1, 0, 0,~
+## $ GarageCars    <int> 2, 2, 2, 3, 3, 2, 2, 2, 2, 1, 1, 3, 1, 3, 1, 2, 2, 2, 2,~
+## $ GarageArea    <int> 548, 460, 608, 642, 836, 480, 636, 484, 468, 205, 384, 7~
+## $ GarageCond    <chr> "TA", "TA", "TA", "TA", "TA", "TA", "TA", "TA", "TA", "T~
+## $ WoodDeckSF    <int> 0, 298, 0, 0, 192, 40, 255, 235, 90, 0, 0, 147, 140, 160~
+## $ OpenPorchSF   <int> 61, 0, 42, 35, 84, 30, 57, 204, 0, 4, 0, 21, 0, 33, 213,~
+## $ PoolArea      <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
+## $ MiscVal       <int> 0, 0, 0, 0, 0, 700, 0, 350, 0, 0, 0, 0, 0, 0, 0, 0, 700,~
+## $ YrSold        <int> 2008, 2007, 2008, 2006, 2008, 2009, 2007, 2009, 2008, 20~
+## $ SaleType      <fct> WD, WD, WD, WD, WD, WD, WD, WD, WD, WD, WD, New, WD, New~
+## $ SaleCondition <fct> Normal, Normal, Normal, Abnorml, Normal, Normal, Normal,~
+## $ SalePrice     <int> 208500, 181500, 223500, 140000, 250000, 143000, 307000, ~
+\end{verbatim}
+
+Let's see some boxplot
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-28-1.pdf}
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-28-2.pdf}
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-28-3.pdf}
+
+As we can see, SalePrice, GrLivArea have some outliers\ldots{} For the
+sake that we want to run regression analysis, we limit the variables to
+numerical moving forward.
+
+Let's see some correlations
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-29-1.pdf}
+
+Based on the correlation plot, if we want to select those with high
+correlation with the target variable. Let's run another correlation
+function to help us select these variables rather than relying on visual
+(nothing wrong with visual)\ldots{}
+
+\begin{verbatim}
+## Warning in .font_global(font, quiet = FALSE): Font 'Arial Narrow' is not
+## installed, has other name, or can't be found
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-30-1.pdf}
+
+We will keep the variables with 0.5 above\ldots{} there are really 08
+variables ( )
+
+Let's see SalesPrice Vs. GrLivArea
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-31-1.pdf}
+
+Let's see SalesPrice Vs. YearBuilt
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-32-1.pdf}
+
+Let's see SalesPrice Vs. YearRemodAdd
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-33-1.pdf}
+
+Definitely high correlation and linear relationship\ldots.
+
+\hypertarget{modelling}{%
+\subsubsection{Modelling}\label{modelling}}
+
+We will run multiple linear regression and Neutral Network. There are
+definitely regression variables in this dataset. the neutral network is
+to see how other algorithm will perform, specially those on the
+unsupervised category. Neutral network seem to have perfomance in neuron
+analysis (according to neuroscientists who performed them\ldots)
+
+\hypertarget{splitting-the-data}{%
+\paragraph{Splitting the data}\label{splitting-the-data}}
+
+Split will be 0.8 train and 0.2 test
+
+\hypertarget{multiple-linear-regression-model1}{%
+\paragraph{Multiple Linear Regression
+(model1)}\label{multiple-linear-regression-model1}}
+
+We want to use glm() function due to more than one
+independent/predictors.
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = SalePrice ~ ., data = train)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -476681   -20824    -3747    17360   296387  
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  -2.114e+06  1.469e+05 -14.391  < 2e-16 ***
+## YearBuilt     4.827e+02  6.049e+01   7.980 3.52e-15 ***
+## YearRemodAdd  5.875e+02  7.809e+01   7.524 1.07e-13 ***
+## X1stFlrSF     3.499e+01  4.143e+00   8.445  < 2e-16 ***
+## GrLivArea     6.928e+01  3.665e+00  18.902  < 2e-16 ***
+## FullBath     -4.560e+03  3.309e+03  -1.378    0.169    
+## GarageCars    1.886e+04  3.732e+03   5.053 5.04e-07 ***
+## GarageArea    1.271e+01  1.294e+01   0.982    0.326    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1844051805)
+## 
+##     Null deviance: 7.4845e+12  on 1161  degrees of freedom
+## Residual deviance: 2.1280e+12  on 1154  degrees of freedom
+## AIC: 28099
+## 
+## Number of Fisher Scoring iterations: 2
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-35-1.pdf}
+
+Wow! All the variables show good significance to the SalePrice.
+
+\hypertarget{neutral-network-model2}{%
+\paragraph{Neutral Network (model2)}\label{neutral-network-model2}}
+
+\begin{verbatim}
+## 
+## Attaching package: 'neuralnet'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     compute
+\end{verbatim}
+
+\begin{figure}
+\centering
+\includegraphics{NN_plot.jpeg}
+\caption{Neutral network plot}
+\end{figure}
+
+Well done!
+
+predicting NN
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-37-1.pdf}
+
+\begin{verbatim}
+##                   MSE_model2
+## MSE_model1         922874054.912377
+##   1477004184.67592                1
+\end{verbatim}
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-37-2.pdf}
+
+Neutral Network seems about equal performance with multiple linear
+regression.
+
+A closer look
+
+\includegraphics{Data622_final_project_files/figure-latex/unnamed-chunk-38-1.pdf}
+
+It is a hard call here\ldots but we want to go with Multiple linear
+regression since it has a better MSE and p-value.
+
+\hypertarget{references}{%
+\subsubsection{References}\label{references}}
+
+1 -
+\url{file:///C:/Users/owner/Downloads/622-Article\%20Text-961-2-10-20220308.pdf}
+
+2 - \url{http://neuralnetworksanddeeplearning.com/chap1.html}
+
+3-
+\url{https://cran.r-project.org/web/packages/dlookr/vignettes/EDA.html}
+
+4-
+\url{https://stats.oarc.ucla.edu/stat/data/rmarkdown/rmarkdown_seminar_flat.html\#links-internal-and-external}
+
+5- \url{https://plotly.com/r/line-charts/}
+
+6-
+\url{https://www.r-bloggers.com/2015/09/fitting-a-neural-network-in-r-neuralnet-package/}
+
+\end{document}
